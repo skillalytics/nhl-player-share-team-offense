@@ -7,8 +7,8 @@
 # DATA PREP ---------------------------------------------------------------
 
   # Load Datasets
-  href_ss <- read.csv('./data/input/skater_stats.csv')
-  href_stnd <- read.csv('./data/input/league_standings.csv')
+  href_ss <- read.csv('./data/input/skater_stats.csv', stringsAsFactors = FALSE)
+  href_stnd <- read.csv('./data/input/league_standings.csv', stringsAsFactors = FALSE)
   
   # Team Reference File
   team_ref <- read.csv('./ref/team_lookup.csv')
@@ -216,6 +216,44 @@
       PCT_OPS_CUMM = cumsum(PCT_OPS)
     ) %>%
     ungroup()
+
+
+# REMOVE OPS & RELATED METRICS FROM POSTSEASON ----------------------------
+  
+  # This is not relevant for the postseason as this is a metric that captures how each player contributes
+  # to points in the standings, i.e. what contribution they had to team getting 2-points after a win
+  
+  player_share_team_offense <- player_share_team_offense %>%
+    mutate(
+      LEAG_PTS = case_when(
+        Game_Type == "POST" ~ NA_integer_,
+        TRUE ~ LEAG_PTS
+      ),
+      MG = case_when(
+        Game_Type == "POST" ~ NA_real_,
+        TRUE ~ MG
+      ),
+      MGP = case_when(
+        Game_Type == "POST" ~ NA_real_,
+        TRUE ~ MGP
+      ),
+      OPS = case_when(
+        Game_Type == "POST" ~ NA_real_,
+        TRUE ~ OPS
+      ),
+      PCT_OPS = case_when(
+        Game_Type == "POST" ~ NA_real_,
+        TRUE ~ PCT_OPS
+      ),
+      OPS_RNK = case_when(
+        Game_Type == "POST" ~ NA_integer_,
+        TRUE ~ OPS_RNK
+      ),
+      PCT_OPS_CUMM = case_when(
+        Game_Type == "POST" ~ NA_real_,
+        TRUE ~ PCT_OPS_CUMM
+      )
+    )
 
 
 # SAVE OUTPUT -------------------------------------------------------------
